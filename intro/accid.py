@@ -1,2 +1,2 @@
-ACC_ID = "2128418403"
+ACC_ID = "id"
 # Получить можно используя GetAccount в Account_n_Portfolio.py
