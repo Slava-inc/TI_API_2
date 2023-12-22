@@ -23,7 +23,7 @@ dtypes_dic = {'time': str,
               }
 
 # Часть для обработки файла с данными
-hist_candles_inst = pd.read_csv('csv_files/moex_mini_092022_09mnth.csv', dtype=dtypes_dic)
+hist_candles_inst = pd.read_csv('csv_files/instrument_name.csv', dtype=dtypes_dic)
 
 # Здесь запросы токена и id из stub файлов, и самого клиента из библиотеки Тинькофф
 TOKEN = intro.basek.TINKOFF_INVEST_DOG_NEW

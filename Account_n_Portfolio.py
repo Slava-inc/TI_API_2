@@ -13,7 +13,7 @@ def get_account_info():
     print(gai)
 
 
-get_account_info()
+# get_account_info()
 
 # Для получения Портфеля
 def show_portfolio():
@@ -23,5 +23,5 @@ def show_portfolio():
 
     return
 
-# show_portfolio()
+show_portfolio()
 

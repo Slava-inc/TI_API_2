@@ -9,7 +9,8 @@ from datetime import datetime
 import time
 from pathlib import Path
 
-hist_candles_brent = pd.read_csv('csv_files/brent062022_report.csv')
+# hist_candles_brent = pd.read_csv('csv_files/brent062022_report.csv')
+historical_candles_df = pd.read_csv('csv_files/instrument_name.csv')
 
 with plt.style.context('Solarize_Light2'):
     a = historical_candles_df['time']

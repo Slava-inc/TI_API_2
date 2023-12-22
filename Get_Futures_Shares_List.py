@@ -15,7 +15,7 @@ User_acc_ID = intro.accid.ACC_ID
 def futures_list():
     with SDK_client as client:
         fc = client.instruments.futures(instrument_status=2)
-        futur_list = futures_list_structure(fc.instruments)
+        futur_list = futures_list_structure(fc.instruments).gitignore
         return futur_list
 
 
