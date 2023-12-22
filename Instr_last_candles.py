@@ -16,10 +16,14 @@ User_acc_ID = intro.accid.ACC_ID
 # Здесь переменные по которым будет производиться запрос свечей (Figi инструмента,
 # интервал данных и месяц, а так же числа за который нужны данные.
 # Эти значения выбираем вручную из полученного списка инструментов
-cti_future = 'FUTBR0722000'
-tf = tinkoff.invest.CandleInterval.CANDLE_INTERVAL_5_MIN
-start_date = datetime.fromisoformat('2022-04-23T10:00:00')  # time from 10 a.m. UTC+3 format: '2022-04-25T13:00:00'
-end_date = datetime.fromisoformat('2022-05-25T19:00:00')  # time to 7 p.m. UTC+3 format: '2022-04-25T13:00:00'
+# cti_future = 'FUTBR0722000'
+cti_future = 'TCSG0722000'
+# tf = tinkoff.invest.CandleInterval.CANDLE_INTERVAL_5_MIN
+# start_date = datetime.fromisoformat('2022-04-23T10:00:00')  # time from 10 a.m. UTC+3 format: '2022-04-25T13:00:00'
+# end_date = datetime.fromisoformat('2022-05-25T19:00:00')  # time to 7 p.m. UTC+3 format: '2022-04-25T13:00:00'
+tf = tinkoff.invest.CandleInterval.CANDLE_INTERVAL_DAY
+start_date = datetime.fromisoformat('2023-07-10T10:00:00')  # time from 10 a.m. UTC+3 format: '2022-04-25T13:00:00'
+end_date = datetime.fromisoformat('2023-12-21T19:00:00')  # time to 7 p.m. UTC+3 format: '2022-04-25T13:00:00'
 
 
 # Функция получения данных свечей по инструменту
@@ -49,7 +53,7 @@ def current_trade_instrument_candles(cti_figi, interval):
                     candle_df['ma'] = ta.sma(candle_df['close'], lenght=10)
                     # Запись полученных данных в табличку
                     # указать название файла соответствующее инструменту
-                    filepath = Path('csv_files/instrument_name.csv')
+                    filepath = Path('csv_files/TCSG23.csv')
                     df = pd.DataFrame(candle_df)
                     print(df.dtypes)
                     df.to_csv(filepath, mode='a')
