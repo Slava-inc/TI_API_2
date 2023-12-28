@@ -3,6 +3,7 @@ import pandas as pd
 import id.basek
 import id.accid
 import os
+from pathlib import Path
 
 # print(os.popen("dir").read())
 
@@ -18,8 +19,8 @@ class Portfolio():
         self.data['figi'] = []
         self.data['instrument'] = []
         self.data['position'] = []
-        # columns = ['figi', 'ticker', 'name', 'instrument_type']
-        # self.df = pd.DataFrame(columns=columns)
+        
+        self.result = {}
         
     def set_portfolio(self):
         SDK = ti.Client(self.token)
@@ -59,9 +60,23 @@ class Portfolio():
                     self.data['figi'].append(instr.figi)
                     self.data['position'].append(self.positions['position'][index])
                     self.data['instrument'].append(instr)
-                    
-    def print(self, kw):
-        info = self.get_info(kw)
+    
+    def get_columns(self):
+        header = []
+        for keys, values in self.result.items():
+            for col in values:
+                header.append(col)
+        return header
+                            
+    def print(self):
+        info = self.get_info()
+        
+        header = self.get_columns()
+        columns = ''
+        for col in header:
+            columns += ' ' + col
+        print(columns)            
+            
         i = len(info[0])
         for item in range(i):
             result = ''
@@ -69,9 +84,40 @@ class Portfolio():
                 result += ' ' + info[pos][item]
             print(result)
                 
-    def get_info(self, kw):
+    def get_info(self):
         info = []
-        for keys, values in kw.items():
+        for keys, values in self.result.items():
             for value in values:
                 info.append([getattr(mem, value) for mem in self.data[keys]])
         return info
+    
+    def save_info(self, filename):
+        if len(self.result) > 0:
+            info = self.get_info()
+        elif len(self.data.figi) == 0:
+            print('empty info data')
+            return
+        
+        columns = self.get_columns()
+        df_dict = {}
+        for col in columns:
+            df_dict[col] = []
+            
+        info = self.get_info()        
+        i = len(info[0])
+        for item in range(i):
+            for pos in range(len(info)):
+                df_dict[columns[pos]].append(info[pos][item])
+        filepath = Path('csv_files/' + filename)
+        try:
+            pd.DataFrame(df_dict).to_csv(filepath)
+            print('file''s saved')
+        except OSError as err:
+            print("OS error:", err)
+            
+            
+        
+        
+        
+            
+        

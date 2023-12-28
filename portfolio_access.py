@@ -10,13 +10,6 @@ User_acc_ID = id.accid.ACC_ID
 
 port = Portfolio(TOKEN, User_acc_ID)
 port.create()
-
-res = {'position': ['figi'],
-            'instrument': ['ticker', 'name']}  
-header = ''
-for keys, values in res.items():
-    for col in values:
-        header += "  " + col
-
-print(header)    
-port.print(res)
+port.result = {'position': ['figi'],
+            'instrument': ['ticker', 'name']}    
+port.print()
