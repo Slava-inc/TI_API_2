@@ -1,6 +1,6 @@
 import tinkoff.invest
-import intro.basek
-import intro.accid
+import id.basek
+import id.accid
 from intro.quotation_dt import quotation_count
 import pandas as pd
 import pandas_ta as ta

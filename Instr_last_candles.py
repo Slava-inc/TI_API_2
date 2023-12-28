@@ -2,16 +2,16 @@ from intro.quotation_dt import quotation_count
 from datetime import datetime, timedelta
 from pathlib import Path
 import tinkoff.invest
-import intro.basek
-import intro.accid
+import id.basek
+import id.accid
 import pandas as pd
 import time
 import pandas_ta as ta
 
 # Здесь запросы токена и id из stub файлов, и самого клиента из библиотеки Тинькофф
-TOKEN = intro.basek.TINKOFF_INVEST_DOG_NEW
+TOKEN = id.basek.TINKOFF_INVEST_DOG_NEW
 SDK_client = tinkoff.invest.Client(TOKEN)
-User_acc_ID = intro.accid.ACC_ID
+User_acc_ID = id.accid.ACC_ID
 
 # Здесь переменные по которым будет производиться запрос свечей (Figi инструмента,
 # интервал данных и месяц, а так же числа за который нужны данные.

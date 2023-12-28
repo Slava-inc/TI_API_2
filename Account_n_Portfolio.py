@@ -1,10 +1,13 @@
 import tinkoff.invest
-import intro.basek
-import intro.accid
+import id.basek
+import id.accid
 
-TOKEN = intro.basek.TINKOFF_INVEST_DOG_NEW
-SDK = tinkoff.invest.Client(TOKEN)
-User_acc_ID = intro.accid.ACC_ID
+TOKEN = id.basek.TINKOFF_INVEST_DOG_NEW
+BROKER = id.basek.TINKOFF_INVEST_BROKER
+ALL = id.basek.TINKOFF_INVEST_ALL
+SDK = tinkoff.invest.Client(ALL)
+
+User_acc_ID = id.accid.ACC_ID
 
 # Для полученния ID
 def get_account_info():
@@ -12,8 +15,13 @@ def get_account_info():
         gai = client.users.get_accounts()
     print(gai)
 
-
+# Для полученния BROKER ID
+def get_broker_info():
+    with tinkoff.invest.Client(BROKER) as client:
+        gai = client.users.get_accounts()
+    print(gai)
 # get_account_info()
+get_broker_info()
 
 # Для получения Портфеля
 def show_portfolio():
@@ -23,5 +31,5 @@ def show_portfolio():
 
     return
 
-show_portfolio()
+# show_portfolio()
 

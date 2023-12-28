@@ -1,12 +1,12 @@
 import pandas as pd
 import tinkoff.invest
-import intro
-import intro.basek
-import intro.accid
+import id
+import id.basek
+import id.accid
 
-TOKEN = intro.basek.TINKOFF_INVEST_DOG_NEW
+TOKEN = id.basek.TINKOFF_INVEST_DOG_NEW
 SDK_client = tinkoff.invest.Client(TOKEN)
-User_acc_ID = intro.accid.ACC_ID
+User_acc_ID = id.accid.ACC_ID
 
 with SDK_client as client:
     InsrumentsService = client.instruments

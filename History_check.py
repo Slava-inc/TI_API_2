@@ -7,8 +7,8 @@ import math
 import pandas as pd
 # import matplotlib.pyplot as plt
 import tinkoff.invest
-import intro.basek
-import intro.accid
+import id.basek
+import id.accid
 from intro.quotation_dt import quotation_count
 # from Instr_last_candles import start_date, end_date
 
@@ -26,9 +26,9 @@ dtypes_dic = {'time': str,
 hist_candles_inst = pd.read_csv('csv_files/instrument_name.csv', dtype=dtypes_dic)
 
 # Здесь запросы токена и id из stub файлов, и самого клиента из библиотеки Тинькофф
-TOKEN = intro.basek.TINKOFF_INVEST_DOG_NEW
+TOKEN = id.basek.TINKOFF_INVEST_DOG_NEW
 SDK_client = tinkoff.invest.Client(TOKEN)
-User_acc_ID = intro.accid.ACC_ID
+User_acc_ID = id.accid.ACC_ID
 instrument_figi = 'FUTMXI122200'
 open_positions_limit = 70000
 close_time = datetime.time.fromisoformat('15:30:00')
