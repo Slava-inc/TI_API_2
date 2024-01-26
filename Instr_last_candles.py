@@ -17,13 +17,16 @@ User_acc_ID = id.accid.ACC_ID
 # интервал данных и месяц, а так же числа за который нужны данные.
 # Эти значения выбираем вручную из полученного списка инструментов
 # cti_future = 'FUTBR0722000'
-cti_future = 'TCSG0722000'
+# cti_future = '0e2b0050-d21a-408d-bae3-1e1a353d5308'
+# cti_future = 'BBG00M0C8YM7'
+cti_future = 'TCS00A1036X6'
+
 # tf = tinkoff.invest.CandleInterval.CANDLE_INTERVAL_5_MIN
 # start_date = datetime.fromisoformat('2022-04-23T10:00:00')  # time from 10 a.m. UTC+3 format: '2022-04-25T13:00:00'
 # end_date = datetime.fromisoformat('2022-05-25T19:00:00')  # time to 7 p.m. UTC+3 format: '2022-04-25T13:00:00'
 tf = tinkoff.invest.CandleInterval.CANDLE_INTERVAL_DAY
-start_date = datetime.fromisoformat('2023-07-10T10:00:00')  # time from 10 a.m. UTC+3 format: '2022-04-25T13:00:00'
-end_date = datetime.fromisoformat('2023-12-21T19:00:00')  # time to 7 p.m. UTC+3 format: '2022-04-25T13:00:00'
+start_date = datetime.fromisoformat('2023-09-19T10:00:00')  # time from 10 a.m. UTC+3 format: '2022-04-25T13:00:00'
+end_date = datetime.fromisoformat('2023-10-19T19:00:00')  # time to 7 p.m. UTC+3 format: '2022-04-25T13:00:00'
 
 
 # Функция получения данных свечей по инструменту
@@ -39,6 +42,7 @@ def current_trade_instrument_candles(cti_figi, interval):
                 end = [current_date.year, current_date.month, current_date.day, end_date.hour, end_date.minute]
                 cti_candles = client.market_data.get_candles(
                     figi=cti_figi,
+                    instrument_id = cti_figi,
                     from_=datetime(start[0], start[1], start[2], start[3], start[4]),
                     to=datetime(end[0], end[1], end[2], end[3], end[4]),
                     interval=interval

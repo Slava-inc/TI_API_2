@@ -5,8 +5,6 @@ import id.accid
 import os
 from pathlib import Path
 
-# print(os.popen("dir").read())
-
 class Portfolio():
     def __init__(self, token, id):
         self.token = token
@@ -110,7 +108,7 @@ class Portfolio():
                 df_dict[columns[pos]].append(info[pos][item])
         filepath = Path('csv_files/' + filename)
         try:
-            pd.DataFrame(df_dict).to_csv(filepath)
+            pd.DataFrame(df_dict).to_csv(filepath, encoding='windows-1251')
             print('file''s saved')
         except OSError as err:
             print("OS error:", err)

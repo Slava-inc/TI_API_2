@@ -1,7 +1,10 @@
 .env
+.vscode
 csv_files
 demo_tk
 intro
 id
 demo_tinkoff
 test.py
+download_allcandles.py
+market_data_cache
