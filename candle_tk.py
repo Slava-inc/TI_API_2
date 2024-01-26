@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import Tk
+from tkinter import ttk
 from tkinter import *
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
@@ -21,6 +22,9 @@ import id.basek
 import id.accid
 import Pmw
 from Get_Futures_Shares_List import Futures
+from os import listdir
+from os.path import isfile, join
+from pathlib import Path
 
 TOKEN = id.basek.TINKOFF_INVEST_ALL
 SDK = ti.Client(TOKEN)
@@ -41,7 +45,9 @@ default_feature = futures_names[593]
 root = Tk()
 
 root.title("Terminal")
-root.geometry('1000x800')
+root.geometry('1000x1200') #1000x800
+
+frame = ttk.Frame(borderwidth=1, relief=SOLID, padding=[8, 8])
 
 # futures combobox
 choice = None
@@ -51,14 +57,14 @@ def choseEntry(entry):
     choice.configure(text=chosen_future.get_info()) # filling label choice
     # print('You chose {}, figi = {}'.format(entry, chosen_future.future_figi))    
 
-combobox = Pmw.ComboBox(root, label_text='Futures:', labelpos='wn',
+combobox = Pmw.ComboBox(frame, label_text='Futures:', labelpos='wn',
                         listbox_width=0, dropdown=1,
                         selectioncommand=choseEntry,
                         scrolledlist_items=futures_names)
 combobox.grid(column= 0, row=0, sticky = 'w', padx=8, pady=8)
 combobox.selectitem(default_feature)
  
-choice = Label(root, text='futures', relief='sunken', padx=20, pady=10, justify='left')
+choice = Label(frame, text='futures', relief='sunken', padx=20, pady=10, justify='left')
 choice.grid(column=0, row=1, sticky='w', padx=8, pady=8)
 choseEntry(default_feature) 
 
@@ -103,7 +109,7 @@ def buttonPress(btn):
 def defaultKey(event):
     intervalBox.invoke()
    
-intervalBox = Pmw.ButtonBox(root, labelpos='nw', label_text='', padx=0)
+intervalBox = Pmw.ButtonBox(frame, labelpos='nw', label_text='', padx=0)
 intervalBox.add('1M', command = lambda b='1M': buttonPress(b))
 intervalBox.add('5M', command = lambda b='5M': buttonPress(b))
 intervalBox.add('10M', command = lambda b='10M': buttonPress(b))
@@ -113,12 +119,12 @@ intervalBox.add('Д', command = lambda b='Д': buttonPress(b))
 intervalBox.add('Mес', command = lambda b='Мес': buttonPress(b))
 intervalBox.add('Индикаторы', command = lambda b='Индикаторы': buttonPress(b))
 intervalBox.setdefault('Д')
-root.bind('<Return>', defaultKey)
-root.focus_set()
+frame.bind('<Return>', defaultKey)
+frame.focus_set()
 intervalBox.alignbuttons()
 intervalBox.grid(column=0, row=2, sticky='w')
 
-menu_bar = Menu(root)  # menu begins
+menu_bar = Menu(frame)  # menu begins
 file_menu = Menu(menu_bar, tearoff=0)
 # all file menu-items will be added here next
 menu_bar.add_cascade(label='File', menu=file_menu)
@@ -134,11 +140,59 @@ candles.create(start_date=start_date, end_date=end_date, interval=tf, figi=chose
 candles.get_all_candles_from_cache()
 fig = candles.get_drawing(chosen_future.future_figi)
 
-canvas = FigureCanvasTkAgg(fig, root)
+canvas = FigureCanvasTkAgg(fig, frame)
 canvas.draw()
 canvas.get_tk_widget().grid(column=0, row=3)
 	
-toolbar = NavigationToolbar2Tk(canvas, root, pack_toolbar=False)
+toolbar = NavigationToolbar2Tk(canvas, frame, pack_toolbar=False)
 toolbar.update()
 toolbar.grid(column=0, row=4, sticky='w')
+frame.grid(column=0, row=0, sticky='w')
+
+#drill frame
+mypath = Path(candles.base_cache_dir) / candles.figi
+onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+
+drill_frame = ttk.Frame(borderwidth=1, relief=SOLID, padding=[8, 8])
+
+# candle file combobox
+def choseCandle(entry):
+    fullname = Path(candles.base_cache_dir) / candles.figi / entry
+    candles.create_candle_df(fullname)  
+
+candlecombo = Pmw.ComboBox(drill_frame, label_text='candle file:', labelpos='wn',
+                        listbox_width=0, dropdown=1,
+                        selectioncommand=choseCandle,
+                        scrolledlist_items=onlyfiles)
+
+candlecombo.grid(column= 0, row=0, sticky = 'w', padx=8, pady=8)
+candle_filename = os.path.basename(candles.candle_file) 
+candlecombo.selectitem(candle_filename)
+choseCandle(candle_filename)
+
+trading_label = ttk.Label(drill_frame, text="Trading file name:")
+trading_label.grid(column=1, row=0, sticky='w') 
+trading_entry = ttk.Entry(drill_frame)
+trading_entry.grid(column=2, row=0, sticky='w') 
+
+# trading_label = ttk.Label(drill_frame, text="Time:")
+# trading_label.grid(column=3, row=0, sticky='w') 
+# trading_entry = ttk.Entry(drill_frame)
+# trading_entry.grid(column=4, row=0, sticky='w') 
+# candle file combobox
+
+def choseTime(entry):
+    print('time chosen: ' + str(entry)) 
+
+timecombo = Pmw.ComboBox(drill_frame, label_text='Time:', labelpos='wn',
+                        listbox_width=0, dropdown=1,
+                        selectioncommand=choseTime,
+                        scrolledlist_items=[str(t) for t in candles.df.index])
+
+timecombo.grid(column= 3, row=0, sticky = 'w', padx=8, pady=8)
+timecombo.selectitem(str(candles.df.index[0]))
+choseTime(candles.df.index[0])
+
+drill_frame.grid(column=0, row=1, sticky='w', padx=8, pady=8)
+
 root.mainloop()

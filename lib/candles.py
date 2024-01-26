@@ -24,12 +24,14 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 #TO DO
 # - file name for minutes
 # - do with complete = false
+# - indicators
 
 class Candles():
     def __init__(self, token, id):
         self.token = token
         self.id = id
         self.fig = None
+        self.candle_file = None
         
     def quotation_count(self, quot):
         return quot['units'] + quot['nano'] / 1e9
@@ -77,10 +79,14 @@ class Candles():
         file_name = Path(self.base_cache_dir) / self.figi / self.interval.name
         start_str = str(int(self.start_date.replace(hour=self.start_hour, minute=0, second=0).timestamp()))
         end_str = str(int(self.end_date.replace(hour=self.end_hour, minute=0, second=0).timestamp()))
-        return ('./' + str(file_name) + f"-{start_str}-{end_str}.csv").replace('\\', '/')
+        self.candle_file = ('./' + str(file_name) + f"-{start_str}-{end_str}.csv").replace('\\', '/')
+        return self.candle_file
         
-    def create_candle_df(self):
-        self.df = pd.read_csv(self.get_candle_path())
+    def create_candle_df(self, candle_path = None):
+        if candle_path == None:
+            candle_path = self.get_candle_path()
+            
+        self.df = pd.read_csv(candle_path)
         for column in self.df.columns:
             if column == 'time':
                 continue
