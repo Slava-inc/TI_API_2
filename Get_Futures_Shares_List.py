@@ -12,7 +12,7 @@ SDK_client = tinkoff.invest.Client(TOKEN)
 User_acc_ID = id.accid.ACC_ID
 
 class Futures():
-    def __init__(self, futures_name=Path('F:/grpc_examples/tinkoff/TI_API_2/csv_files/futures_list.csv'),
+    def __init__(self, futures_name=Path('csv_files/futures_list.csv'),
                  shares_name= Path('csv_files/shares_list.csv')):
         self.df_futures = pd.read_csv(futures_name)
         self.df_shares = pd.read_csv(shares_name)
