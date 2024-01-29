@@ -15,8 +15,10 @@ import os
 sys.path.append(os.path.dirname(__file__)+ "/..")
 if __package__:
     from .lib.candles import Candles
+    from .lib.candles import Drills
 else:
     from lib.candles import Candles
+    from lib.candles import Drills
 import tinkoff.invest as ti
 import id.basek
 import id.accid
@@ -194,5 +196,5 @@ timecombo.selectitem(str(candles.df.index[0]))
 choseTime(candles.df.index[0])
 
 drill_frame.grid(column=0, row=1, sticky='w', padx=8, pady=8)
-
+drills = Drills(chosen_future, )
 root.mainloop()
