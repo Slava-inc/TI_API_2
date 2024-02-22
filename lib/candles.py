@@ -1,3 +1,5 @@
+#TODO start, end date edition in candle_option
+
 import tinkoff.invest as ti
 import pandas as pd
 import id.basek
@@ -5,6 +7,7 @@ import id.accid
 import os
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
+import pytz
 import pandas_ta as ta
 import time
 
@@ -42,19 +45,26 @@ class Candles():
         self.end_date = end_date
         self.figi = figi
         self.base_cache_dir = base_cache_dir
-        self.end_hour = 7
+        self.end_hour = 0
         self.start_hour = 0
         hour_interval = [ti.CandleInterval.CANDLE_INTERVAL_HOUR, ti.CandleInterval.CANDLE_INTERVAL_4_HOUR]
         if interval in hour_interval:
             self.end_hour = 15
         if futures:
-            self.end_hour = 16
-            self.start_hour = 4            
+            if interval == ti.CandleInterval.CANDLE_INTERVAL_HOUR:
+                self.end_hour = 16
+                self.start_hour = 4  
+            if interval == ti.CandleInterval.CANDLE_INTERVAL_4_HOUR:
+                self.end_hour = 16   #20
+                self.start_hour = 4
+                        
             
 
         # return self.create_candle_df   
      
     def get_all_candles_from_cache(self):
+        global start_date, end_date, interval
+        
         with Client(self.token) as client:
             settings = MarketDataCacheSettings(base_cache_dir=Path(self.base_cache_dir))
             market_data_cache = MarketDataCache(settings=settings, services=client)
@@ -73,10 +83,15 @@ class Candles():
                 # print(candle.time, candle.is_complete)
             self.start_date = min_date
             self.end_date = max_date
+            # start_date = self.start_date
+            # end_date = self.end_date
             # [_ for _ in candles]
     
-    def get_candle_path(self):
-        file_name = Path(self.base_cache_dir) / self.figi / self.interval.name
+    def get_candle_path(self, basename=True):
+        if basename:
+            file_name = Path(self.base_cache_dir) / self.figi / self.interval.name
+        else:
+            file_name = self.interval.name
         start_str = str(int(self.start_date.replace(hour=self.start_hour, minute=0, second=0).timestamp()))
         end_str = str(int(self.end_date.replace(hour=self.end_hour, minute=0, second=0).timestamp()))
         self.candle_file = ('./' + str(file_name) + f"-{start_str}-{end_str}.csv").replace('\\', '/')

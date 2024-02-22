@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import Tk
 from tkinter import ttk
+from tkinter import messagebox
 from tkinter import *
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
@@ -9,16 +10,17 @@ import mplfinance as fplt
 import pandas as pd
 from datetime import datetime, timezone
 import ast
-
+import yaml
 import sys
 import os
+import glob
 sys.path.append(os.path.dirname(__file__)+ "/..")
 if __package__:
     from .lib.candles import Candles
-    from .lib.candles import Drills
+    from .lib.drills import Drills
 else:
     from lib.candles import Candles
-    from lib.candles import Drills
+    from lib.drills import Drills
 import tinkoff.invest as ti
 import id.basek
 import id.accid
@@ -27,6 +29,9 @@ from Get_Futures_Shares_List import Futures
 from os import listdir
 from os.path import isfile, join
 from pathlib import Path
+from lib.candle_option import Option
+
+global start_date, end_date, default_feature, tf
 
 TOKEN = id.basek.TINKOFF_INVEST_ALL
 SDK = ti.Client(TOKEN)
@@ -42,9 +47,59 @@ end_date = datetime(2024, 1, 10, 19, 0, tzinfo=timezone.utc)
 
 chosen_future = Futures()
 futures_names = chosen_future.df_futures.name
-default_feature = futures_names[593]
+default_feature = futures_names[593]    
+
+try:
+    with open('./csv_files/futures_options.csv', 'r') as f:
+        option_yaml = yaml.safe_load(f) 
+        
+    tf = ti.CandleInterval[option_yaml['interval']]
+    start_date = option_yaml['start_date']
+    end_date = option_yaml['end_date']
+    default_feature = option_yaml['futures name']
+except:
+    option_yaml = None
+
+CandleOption = None
 
 root = Tk()
+
+def on_close(window):
+    global option_yaml, start_date, end_date, default_feature, tf, candles
+    
+    if messagebox.askokcancel("Save", "Do you want to save?"):
+        CandleOption.get_option()
+        option_yaml = CandleOption.option_yaml
+        tf = ti.CandleInterval[option_yaml['interval']]
+        start_date = option_yaml['start_date']
+        end_date = option_yaml['end_date']
+        default_feature = option_yaml['futures name'] 
+        candles.create(start_date=start_date, end_date=end_date, interval=tf, figi=chosen_future.future_figi, futures=True)
+        
+        # option_yaml['start_date'] = candles.start_date.replace(hour=candles.start_hour, minute=0, second=0)
+        # option_yaml['end_date'] = candles.end_date.replace(hour=candles.end_hour, minute=0, second=0)
+        # CandleOption.option_yaml = option_yaml
+        # CandleOption.option_save()   
+        path = candles.get_candle_path(basename=False).replace('./', '')
+        candlecombo.selectitem(path)
+        
+    window.destroy()
+    candles.get_drawing(chosen_future.future_figi)
+    canvas.draw()
+    # candles_load()
+    
+    
+def candle_options():
+    global CandleOption
+    
+    w_option = Tk()
+    w_option.title("candle options")
+    w_option.geometry("450x120")
+
+    # w_option.protocol("WM_DELETE_WINDOW", on_close)
+    w_option.protocol("WM_DELETE_WINDOW", lambda: on_close(w_option))
+    CandleOption = Option(w_option, futures_names, start_date=start_date, end_date=end_date, interval=tf)
+    
 
 root.title("Terminal")
 root.geometry('1000x1200') #1000x800
@@ -126,30 +181,47 @@ frame.focus_set()
 intervalBox.alignbuttons()
 intervalBox.grid(column=0, row=2, sticky='w')
 
-def candle_options():
-    w_option = Tk()
-    w_option.title("candle options")
-    w_option.geometry("250x200")
-    # furtures, start_date, end_date, interval
-
+    
+    
 menu_bar = Menu(frame)  # menu begins
 file_menu = Menu(menu_bar, tearoff=0)
 # all file menu-items will be added here next
 menu_bar.add_cascade(label='File', menu=file_menu)
 edit_menu = Menu(menu_bar, tearoff=0)
 menu_bar.add_cascade(label='Edit', menu=edit_menu)
-view_menu = Menu(menu_bar, tearoff=0)
-menu_bar.add_cascade(label='View', menu=view_menu)
+
+def candles_load():
+    # TODO debug
+    candles.create(start_date=start_date, end_date=end_date, interval=tf, figi=chosen_future.future_figi, futures=True)
+    candles.get_all_candles_from_cache()
+    candles.get_drawing(chosen_future.future_figi)
+    canvas.draw()
+
+def drill_start():
+    pass
+
+run_menu = Menu(menu_bar, tearoff=0)
+run_menu.add_command(label='candles', command=candles_load)
+run_menu.add_command(label='drills', command=drill_start)
+menu_bar.add_cascade(label='Run', menu=run_menu)
+
 option_menu = Menu(menu_bar, tearoff=0)
 option_menu.add_command(label='candles', command=candle_options)
 menu_bar.add_cascade(label='Options',  menu=option_menu)
+
 about_menu = Menu(menu_bar, tearoff=0)
 menu_bar.add_cascade(label='About',  menu=about_menu)
 root.config(menu=menu_bar)  # menu ends
 
+# if ~(option_yaml == None):
+# TODO for all kind in portfolio
 candles.create(start_date=start_date, end_date=end_date, interval=tf, figi=chosen_future.future_figi, futures=True)
 candles.get_all_candles_from_cache()
+start_date = candles.start_date
+end_date = candles.end_date
 fig = candles.get_drawing(chosen_future.future_figi)
+    
+    
 
 canvas = FigureCanvasTkAgg(fig, frame)
 canvas.draw()
@@ -162,7 +234,7 @@ frame.grid(column=0, row=0, sticky='w')
 
 #drill frame
 mypath = Path(candles.base_cache_dir) / candles.figi
-onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+onlyfiles = [os.path.basename(x) for x in glob.glob(str(mypath) + '\*.csv')]
 
 drill_frame = ttk.Frame(borderwidth=1, relief=SOLID, padding=[8, 8])
 
@@ -205,5 +277,5 @@ timecombo.selectitem(str(candles.df.index[0]))
 choseTime(candles.df.index[0])
 
 drill_frame.grid(column=0, row=1, sticky='w', padx=8, pady=8)
-drills = Drills(chosen_future, )
+# drills = Drills(chosen_future, )
 root.mainloop()
